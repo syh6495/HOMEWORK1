@@ -14,14 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 import model.Customer;
 import service.CustomerService;
 
-@WebServlet("/DoLogin")
-public class DoLogin extends HttpServlet {
+@WebServlet("/DoRegister")
+public class DoRegister extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public DoLogin() {
+    public DoRegister() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -33,24 +33,26 @@ public class DoLogin extends HttpServlet {
 		
 		String id = request.getParameter("id");
 		String password = request.getParameter("password");
+		String name = request.getParameter("name");
+		String gender = request.getParameter("gender");
+		String email = request.getParameter("email");
 		
 		CustomerService service = (CustomerService) CustomerService.getInstance();
-		Customer customer = service.login(id,password);
+		Customer customer = service.findCustomer(id);
 		
 		String page;
+		 
 		
-		
-		if(customer==null){
-			page = "/view/loginFail.jsp";
-		//	request.setAttribute("id",id);
-		}
-		else { // 아이디 비밀번호 매칭 논리 구현
-			if(customer.getPassword().equals(password)) {
-			page = "/view/loginSuccess.jsp";
+		if(customer==null){ // 가입
+			page = "/view/registerSuccess.jsp";
+			service.addCustomer(new Customer(id,password ,name,gender,email));
+			customer = service.findCustomer(id);
 			request.setAttribute("customer", customer);
-			}
-			else
-				page = "/view/loginFail.jsp";
+		}
+		else { // 가입불가
+			page = "/view/registerFail.jsp";
+			request.setAttribute("customer", customer);
+			
 		}
 		
 		RequestDispatcher dispatcher= request.getRequestDispatcher(page);
